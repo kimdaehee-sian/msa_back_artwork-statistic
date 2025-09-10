@@ -36,4 +36,14 @@ management:
 logging:
   level:
     com.example.artwork_statistics: DEBUG
-    org.springframework.web.client: DEBUG 
+    org.springframework.web.client: DEBUG
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json 
