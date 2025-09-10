@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  artwork-statistics-service:
+    build: .
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/artwork_statistics
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SERVER_PORT=8082
+    depends_on:
+      - mysql
+    networks:
+      - artwork-network
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=artwork_statistics
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - artwork-network
+
+volumes:
+  mysql_data:
+
+networks:
+  artwork-network:
+    driver: bridge 

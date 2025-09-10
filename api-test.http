@@ -1,0 +1,75 @@
+### 좋아요 저장 API 테스트
+POST http://localhost:8080/api/likes
+Content-Type: application/json
+
+{
+  "artworkId": 12
+}
+
+###
+
+### 좋아요 저장 API 테스트 (2번째 작품)
+POST http://localhost:8080/api/likes
+Content-Type: application/json
+
+{
+  "artworkId": 7
+}
+
+###
+
+### 좋아요 저장 API 테스트 (3번째 작품)
+POST http://localhost:8080/api/likes
+Content-Type: application/json
+
+{
+  "artworkId": 3
+}
+
+###
+
+### 추가 좋아요 (12번 작품이 최고가 되도록)
+POST http://localhost:8080/api/likes
+Content-Type: application/json
+
+{
+  "artworkId": 12
+}
+
+###
+
+### 추가 좋아요 (12번 작품)
+POST http://localhost:8080/api/likes
+Content-Type: application/json
+
+{
+  "artworkId": 12
+}
+
+###
+
+### 추가 좋아요 (7번 작품)
+POST http://localhost:8080/api/likes
+Content-Type: application/json
+
+{
+  "artworkId": 7
+}
+
+###
+
+### Top3 작품 조회 API 테스트
+GET http://localhost:8080/api/stats/top3
+Accept: application/json
+
+###
+
+### H2 Database Console 접속
+### URL: http://localhost:8080/h2-console
+### JDBC URL: jdbc:h2:mem:testdb
+### Username: sa
+### Password: password
+
+### 데이터 확인 SQL
+### SELECT * FROM likes;
+### SELECT artwork_id, COUNT(*) as like_count FROM likes GROUP BY artwork_id ORDER BY like_count DESC; 

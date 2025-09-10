@@ -1,0 +1,40 @@
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Gradle
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+gradle-wrapper.properties
+
+# Application
+*.log
+*.tmp
+*.temp
+
+# Test files
+src/test/
+
+# HTTP test files
+*.http
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore 

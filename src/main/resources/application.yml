@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    url: jdbc:mysql://${AZURE_MYSQL_HOST:localhost}:${AZURE_MYSQL_PORT:3306}/${AZURE_MYSQL_DATABASE:artwork_statistics}?useSSL=true&requireSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${AZURE_MYSQL_USERNAME:root}
+    password: ${AZURE_MYSQL_PASSWORD:password}
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+server:
+  port: ${SERVER_PORT:${PORT:8080}}
+  servlet:
+    context-path: /
+
+external-services:
+  exhibition-artwork:
+    base-url: ${EXHIBITION_SERVICE_URL:http://localhost:8081}
+    timeout: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    com.example.artwork_statistics: DEBUG
+    org.springframework.web.client: DEBUG 
