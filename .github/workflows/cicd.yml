@@ -62,7 +62,7 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
           images: index.docker.io/${{ env.DOCKER_IMAGE }}:${{ steps.vars.outputs.TAG }}
 
       # 보안상 세션 정리: Docker Hub 로그아웃
