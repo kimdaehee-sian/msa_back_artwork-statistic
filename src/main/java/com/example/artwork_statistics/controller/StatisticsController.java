@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/stats")
+@RequestMapping("/api/v1/artwork-stats")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Statistics", description = "작품 통계 관련 API")
