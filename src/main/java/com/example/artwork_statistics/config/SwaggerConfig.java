@@ -24,6 +24,7 @@ public class SwaggerConfig {
                                 .email("contact@guidely.com")))
                 .servers(List.of(
                         new Server().url("http://localhost:8080").description("Local Development"),
-                        new Server().url("http://localhost:8082").description("Docker Environment")));
+                        new Server().url("http://localhost:8082").description("Docker Environment"),
+                        new Server().url("https://guidely-artwork-statistic-fah0b3dte6hvech2.koreacentral-01.azurewebsites.net").description("Azure Production")));
     }
 } 

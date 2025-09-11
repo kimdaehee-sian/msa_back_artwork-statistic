@@ -24,6 +24,12 @@ public class StatisticsController {
     
     private final StatisticsService statisticsService;
     
+    @GetMapping("/test")
+    public ResponseEntity<String> test() {
+        log.info("Test endpoint called");
+        return ResponseEntity.ok("StatisticsController is working!");
+    }
+    
     @GetMapping("/top3")
     @Operation(summary = "상위 3개 작품 조회", description = "좋아요 수가 가장 많은 상위 3개 작품을 조회합니다.")
     @ApiResponses(value = {
