@@ -29,12 +29,30 @@ public class StatisticsService {
         List<Object[]> top3Results = likeRepository.findTop3ArtworksByLikes();
         
         List<TopArtworkDto> topArtworks = new ArrayList<>();
-        System.out.println("top3Results: " + top3Results);
+        log.debug("top3Results size: {}", top3Results != null ? top3Results.size() : "null");
+        
+        // 데이터가 없는 경우 처리
+        if (top3Results == null || top3Results.isEmpty()) {
+            log.warn("No artwork likes found in database, returning empty list");
+            return TopArtworksResponseDto.builder()
+                    .topArtworks(new ArrayList<>())
+                    .build();
+        }
         
         // 2. 각 artwork에 대해 외부 서비스에서 상세 정보 조회
         for (Object[] result : top3Results) {
+            if (result == null || result.length < 2) {
+                log.warn("Invalid result from database: {}", result);
+                continue;
+            }
+            
             Long artworkId = (Long) result[0];
             Long likeCount = (Long) result[1];
+            
+            if (artworkId == null) {
+                log.warn("artworkId is null, skipping");
+                continue;
+            }
             
             log.debug("Processing artwork: {} with {} likes", artworkId, likeCount);
             
@@ -43,39 +61,85 @@ public class StatisticsService {
             log.debug("exhibitionArtworkClient is null: {}", exhibitionArtworkClient == null);
             log.debug("artworkId: {}", artworkId);
 
-            ArtworkDetailDto artworkDetail = exhibitionArtworkClient.getArtworkDetail(artworkId);
+            ArtworkDetailDto artworkDetail = null;
+            try {
+                artworkDetail = exhibitionArtworkClient.getArtworkDetail(artworkId);
+                log.debug("Successfully got artworkDetail from client");
+            } catch (Exception e) {
+                log.error("Error getting artwork detail from client for artworkId: {}", artworkId, e);
+            }
 
             log.debug("artworkDetail is null: {}", artworkDetail == null);
-            log.debug("artworkDetail: {}", artworkDetail);
+            if (artworkDetail != null) {
+                log.debug("artworkDetail.getTitle(): {}", artworkDetail.getTitle());
+                log.debug("artworkDetail.getArtist(): {}", artworkDetail.getArtist());
+                log.debug("artworkDetail.getImageUrl(): {}", artworkDetail.getImageUrl());
+            }
             log.debug("=== DEBUGGING END ===");
 
-            // null 체크 추가
+            // null 체크 및 fallback 처리 강화
             if (artworkDetail == null) {
                 log.warn("artworkDetail is null for artworkId: {}, creating fallback data", artworkId);
-                artworkDetail = ArtworkDetailDto.builder()
-                        .artworkId(artworkId)
-                        .title("Fallback Artwork " + artworkId)
-                        .artist("Fallback Artist " + artworkId)
-                        .imageUrl("https://via.placeholder.com/300x400?text=No+Image")
-                        .build();
+                artworkDetail = createFallbackArtworkDetail(artworkId);
+            }
+
+            // 추가적인 null 체크
+            if (artworkDetail == null) {
+                log.error("Failed to create fallback data for artworkId: {}, skipping this artwork", artworkId);
+                continue; // 이 artwork는 건너뛰고 다음으로
+            }
+
+            // 필드별 null 체크
+            String title = artworkDetail.getTitle();
+            String artist = artworkDetail.getArtist();
+            String imageUrl = artworkDetail.getImageUrl();
+            
+            if (title == null) {
+                log.warn("title is null for artworkId: {}, using fallback", artworkId);
+                title = "Unknown Title " + artworkId;
+            }
+            
+            if (artist == null) {
+                log.warn("artist is null for artworkId: {}, using fallback", artworkId);
+                artist = "Unknown Artist";
+            }
+            
+            if (imageUrl == null) {
+                log.warn("imageUrl is null for artworkId: {}, using fallback", artworkId);
+                imageUrl = "https://via.placeholder.com/300x400?text=No+Image";
             }
 
             // 4. 응답 DTO 생성
-            TopArtworkDto topArtwork = TopArtworkDto.builder()
-                    .artworkId(artworkId)
-                    .name(artworkDetail.getTitle())
-                    .artist(artworkDetail.getArtist())
-                    .imageUrl(artworkDetail.getImageUrl())
-                    .likeCount(likeCount)
-                    .build();
-            
-            topArtworks.add(topArtwork);
+            try {
+                TopArtworkDto topArtwork = TopArtworkDto.builder()
+                        .artworkId(artworkId)
+                        .name(title)
+                        .artist(artist)
+                        .imageUrl(imageUrl)
+                        .likeCount(likeCount)
+                        .build();
+                
+                topArtworks.add(topArtwork);
+                log.debug("Successfully created TopArtworkDto for artworkId: {}", artworkId);
+            } catch (Exception e) {
+                log.error("Failed to create TopArtworkDto for artworkId: {}", artworkId, e);
+            }
         }
         
         log.debug("Found {} top artworks", topArtworks.size());
         
         return TopArtworksResponseDto.builder()
                 .topArtworks(topArtworks)
+                .build();
+    }
+
+    private ArtworkDetailDto createFallbackArtworkDetail(Long artworkId) {
+        log.warn("Creating fallback artwork detail for artworkId: {}", artworkId);
+        return ArtworkDetailDto.builder()
+                .artworkId(artworkId)
+                .title("Fallback Artwork " + artworkId)
+                .artist("Fallback Artist " + artworkId)
+                .imageUrl("https://via.placeholder.com/300x400?text=No+Image")
                 .build();
     }
 } 
