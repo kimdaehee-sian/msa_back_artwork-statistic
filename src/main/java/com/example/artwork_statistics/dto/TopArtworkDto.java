@@ -14,5 +14,6 @@ public class TopArtworkDto {
     private Long artworkId;
     private String name;
     private String artist;
+    private String imageUrl;
     private Long likeCount;
 } 

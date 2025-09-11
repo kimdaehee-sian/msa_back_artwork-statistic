@@ -29,6 +29,7 @@ public class StatisticsService {
         List<Object[]> top3Results = likeRepository.findTop3ArtworksByLikes();
         
         List<TopArtworkDto> topArtworks = new ArrayList<>();
+        System.out.println("top3Results: " + top3Results);
         
         // 2. 각 artwork에 대해 외부 서비스에서 상세 정보 조회
         for (Object[] result : top3Results) {
@@ -38,13 +39,33 @@ public class StatisticsService {
             log.debug("Processing artwork: {} with {} likes", artworkId, likeCount);
             
             // 3. Exhibition Artwork Service에서 상세 정보 조회
+            log.debug("=== DEBUGGING START ===");
+            log.debug("exhibitionArtworkClient is null: {}", exhibitionArtworkClient == null);
+            log.debug("artworkId: {}", artworkId);
+
             ArtworkDetailDto artworkDetail = exhibitionArtworkClient.getArtworkDetail(artworkId);
-            
+
+            log.debug("artworkDetail is null: {}", artworkDetail == null);
+            log.debug("artworkDetail: {}", artworkDetail);
+            log.debug("=== DEBUGGING END ===");
+
+            // null 체크 추가
+            if (artworkDetail == null) {
+                log.warn("artworkDetail is null for artworkId: {}, creating fallback data", artworkId);
+                artworkDetail = ArtworkDetailDto.builder()
+                        .artworkId(artworkId)
+                        .title("Fallback Artwork " + artworkId)
+                        .artist("Fallback Artist " + artworkId)
+                        .imageUrl("https://via.placeholder.com/300x400?text=No+Image")
+                        .build();
+            }
+
             // 4. 응답 DTO 생성
             TopArtworkDto topArtwork = TopArtworkDto.builder()
                     .artworkId(artworkId)
-                    .name(artworkDetail.getName())
+                    .name(artworkDetail.getTitle())
                     .artist(artworkDetail.getArtist())
+                    .imageUrl(artworkDetail.getImageUrl())
                     .likeCount(likeCount)
                     .build();
             
