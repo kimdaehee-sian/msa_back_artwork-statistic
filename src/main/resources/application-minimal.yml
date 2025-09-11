@@ -15,6 +15,12 @@ spring:
     console:
       enabled: true
 
+external-services:
+  exhibition-artwork:
+    base-url: ${EXHIBITION_SERVICE_URL:https://guidely-exhibition-artwork-services-dmeagqebfud4e7hh.koreacentral-01.azurewebsites.net}
+    timeout: 5000
+
 logging:
   level:
-    root: INFO 
+    root: INFO
+    com.example.artwork_statistics: DEBUG 

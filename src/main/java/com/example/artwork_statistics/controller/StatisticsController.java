@@ -33,10 +33,13 @@ public class StatisticsController {
     public ResponseEntity<TopArtworksResponseDto> getTop3Artworks() {
         log.info("Received request for top 3 artworks");
         
-        TopArtworksResponseDto response = statisticsService.getTop3Artworks();
-        
-        log.info("Returning {} top artworks", response.getTopArtworks().size());
-        
-        return ResponseEntity.ok(response);
+        try {
+            TopArtworksResponseDto response = statisticsService.getTop3Artworks();
+            log.info("Returning {} top artworks", response.getTopArtworks().size());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Error occurred while getting top 3 artworks", e);
+            throw e; // 다시 던져서 Spring의 글로벌 예외 처리기가 처리하도록 함
+        }
     }
 } 

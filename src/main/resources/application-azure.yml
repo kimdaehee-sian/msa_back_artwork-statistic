@@ -15,6 +15,11 @@ server:
   port: ${PORT:8080}
   forward-headers-strategy: framework
 
+external-services:
+  exhibition-artwork:
+    base-url: ${EXHIBITION_SERVICE_URL:https://guidely-exhibition-artwork-services-dmeagqebfud4e7hh.koreacentral-01.azurewebsites.net}
+    timeout: 5000
+
 logging:
   level:
     root: INFO
