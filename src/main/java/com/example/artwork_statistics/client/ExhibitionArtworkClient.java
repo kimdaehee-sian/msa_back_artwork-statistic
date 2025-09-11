@@ -20,15 +20,26 @@ public class ExhibitionArtworkClient {
             String url = config.getBaseUrl() + "/api/artworks/" + artworkId;
             log.debug("Calling Exhibition Artwork Service: {}", url);
             
-            return restTemplate.getForObject(url, ArtworkDetailDto.class);
+            ArtworkDetailDto result = restTemplate.getForObject(url, ArtworkDetailDto.class);
+            
+            // null 체크 추가
+            if (result == null) {
+                log.warn("Received null response from external service for artworkId: {}", artworkId);
+                return createTestData(artworkId);
+            }
+            
+            return result;
         } catch (Exception e) {
             log.error("Failed to get artwork detail for artworkId: {}", artworkId, e);
-            // 실패 시 테스트용 데이터 반환
-            return ArtworkDetailDto.builder()
-                    .artworkId(artworkId)
-                    .name("Test Artwork " + artworkId)
-                    .artist("Test Artist " + artworkId)
-                    .build();
+            return createTestData(artworkId);
         }
+    }
+
+    private ArtworkDetailDto createTestData(Long artworkId) {
+        return ArtworkDetailDto.builder()
+                .artworkId(artworkId)
+                .name("Test Artwork " + artworkId)
+                .artist("Test Artist " + artworkId)
+                .build();
     }
 } 
