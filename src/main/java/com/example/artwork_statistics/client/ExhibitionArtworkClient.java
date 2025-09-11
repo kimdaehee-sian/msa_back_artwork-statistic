@@ -23,11 +23,11 @@ public class ExhibitionArtworkClient {
             return restTemplate.getForObject(url, ArtworkDetailDto.class);
         } catch (Exception e) {
             log.error("Failed to get artwork detail for artworkId: {}", artworkId, e);
-            // 실패 시 기본 정보만 반환
+            // 실패 시 테스트용 데이터 반환
             return ArtworkDetailDto.builder()
                     .artworkId(artworkId)
-                    .name("Unknown Artwork")
-                    .artist("Unknown Artist")
+                    .name("Test Artwork " + artworkId)
+                    .artist("Test Artist " + artworkId)
                     .build();
         }
     }
