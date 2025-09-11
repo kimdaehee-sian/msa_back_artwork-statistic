@@ -19,12 +19,29 @@ public class ExhibitionArtworkClient {
     
     @PostConstruct
     public void logConfig() {
-        log.info("Exhibition Artwork Service configured with baseUrl: {}", config.getBaseUrl());
+        String baseUrl = config.getBaseUrl();
+        log.info("Original baseUrl from config: {}", baseUrl);
+        
+        if (baseUrl != null && baseUrl.startsWith("http://")) {
+            String httpsUrl = baseUrl.replace("http://", "https://");
+            log.warn("Detected HTTP URL, will convert to HTTPS: {} -> {}", baseUrl, httpsUrl);
+        }
+        
+        log.info("Exhibition Artwork Service will use: {}", 
+                baseUrl != null && baseUrl.startsWith("http://") ? 
+                baseUrl.replace("http://", "https://") : baseUrl);
     }
     
     public ArtworkDetailDto getArtworkDetail(Long artworkId) {
         try {
-            String url = config.getBaseUrl() + "/api/artworks/" + artworkId;
+            String baseUrl = config.getBaseUrl();
+            // HTTP를 HTTPS로 강제 변환
+            if (baseUrl != null && baseUrl.startsWith("http://")) {
+                baseUrl = baseUrl.replace("http://", "https://");
+                log.debug("Converted HTTP to HTTPS: {}", baseUrl);
+            }
+            
+            String url = baseUrl + "/api/artworks/" + artworkId;
             log.debug("Calling Exhibition Artwork Service: {}", url);
             
             // RestTemplate null 체크
@@ -41,10 +58,20 @@ public class ExhibitionArtworkClient {
             
             ArtworkDetailDto result = null;
             try {
+                log.debug("About to call RestTemplate.getForObject with URL: {}", url);
                 result = restTemplate.getForObject(url, ArtworkDetailDto.class);
-                log.debug("RestTemplate call completed");
+                log.debug("RestTemplate call completed, result is null: {}", result == null);
+                
+                if (result != null) {
+                    log.debug("Received artwork data - ID: {}, Title: {}, Artist: {}, ImageUrl: {}", 
+                            result.getArtworkId(), result.getTitle(), result.getArtist(), result.getImageUrl());
+                }
             } catch (Exception e) {
-                log.error("RestTemplate call failed for url: {}", url, e);
+                log.error("RestTemplate call failed for url: {} - Error type: {} - Message: {}", 
+                        url, e.getClass().getSimpleName(), e.getMessage());
+                if (e.getCause() != null) {
+                    log.error("Caused by: {} - {}", e.getCause().getClass().getSimpleName(), e.getCause().getMessage());
+                }
                 return createFallbackData(artworkId);
             }
             

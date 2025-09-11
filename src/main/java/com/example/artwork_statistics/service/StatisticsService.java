@@ -31,6 +31,15 @@ public class StatisticsService {
         List<TopArtworkDto> topArtworks = new ArrayList<>();
         log.debug("top3Results size: {}", top3Results != null ? top3Results.size() : "null");
         
+        if (top3Results != null && !top3Results.isEmpty()) {
+            for (int i = 0; i < top3Results.size(); i++) {
+                Object[] result = top3Results.get(i);
+                log.debug("Database result {}: artworkId={}, likeCount={}", 
+                        i, result != null && result.length > 0 ? result[0] : "null", 
+                        result != null && result.length > 1 ? result[1] : "null");
+            }
+        }
+        
         // 데이터가 없는 경우 처리
         if (top3Results == null || top3Results.isEmpty()) {
             log.warn("No artwork likes found in database, returning empty list");
